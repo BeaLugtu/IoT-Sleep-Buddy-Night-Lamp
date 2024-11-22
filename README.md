@@ -107,3 +107,37 @@ void loop() {
   }
   delay(10000);  // Wait for 10 seconds before sending the next request
 }
+```
+
+## 4.3 Cloud Communication (No Database):
+- **Vercel Hosting**: Host the web app on Vercel, which handles static files and dynamic interactions with the backend. No database is needed since the data (like light color and schedule) can be stored temporarily in browser local storage or sent directly from the web app to the Arduino via HTTP requests.
+- **Backend**: Use **PHP** or **Node.js** to handle the API calls to communicate with the **ESP8266/ESP32**.
+- The **ESP8266/ESP32** sends data to the web app using real-time connections or simple HTTP requests.
+
+---
+
+## 5. Assembly and Deployment
+
+### 5.1 Prototype Phase:
+- Start with basic LEDs connected to an **Arduino Uno** for easy testing.
+- Use a breadboard for prototyping and jumper wires for connections.
+- Test the functionality of the app by connecting it to the Arduino via USB or Wi-Fi (using **ESP8266/ESP32**).
+
+### 5.2 Final Build:
+- Once testing is complete, move to **RGB LED strips** and connect them to the **ESP32/ESP8266**.
+- Integrate the components into a final housing, which could be made of **acrylic**, **wood**, or **plastic** for a more polished look.
+
+### 5.3 Cloud and Web App Integration:
+- Host the web app on **Vercel**. This provides an easy deployment path with fast, scalable hosting.
+- Real-time updates will be managed using **WebSockets** or **HTTP requests**.
+
+### 5.4 Final Testing:
+- After assembling the hardware and connecting everything, test the lamp using the web app. Ensure that the web app communicates with the Arduino to control the light based on the schedule or user settings.
+
+---
+
+## Conclusion
+This approach provides a comprehensive plan for building the IoT-based "Sleep Buddy" Night Lamp. The system involves:
+- A **web app** for user control.
+- **Wi-Fi communication** between the web app and the Arduino via the cloud (hosted on **Vercel**).
+- No database needed — communication happens in real-time through **HTTP** or **WebSockets**, with settings stored temporarily on the web app or Arduino.
