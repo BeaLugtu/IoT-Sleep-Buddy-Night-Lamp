@@ -26,6 +26,7 @@ function Login() {
 
     const onSubmit = (data) => {
         console.log("Form Data:", data);
+        navigate("/dashboard")
     };
 
     // Toggle function for password visibility
