@@ -1,5 +1,11 @@
+import { useNavigate } from 'react-router-dom';
 function Hero() {
-    return (
+  const navigate = useNavigate()
+  const handleGetstartedClick = () => {
+      navigate('/signup')
+  }
+
+  return (
       <section
         className="flex items-center justify-center h-[100vh] text-white"
         style={{
@@ -26,7 +32,7 @@ function Hero() {
             Create the perfect lighting for work, relaxation, or ambiance—automatically or with a simple touch.
           </p>
           <div className="space-x-4">
-            <button className="px-6 py-3 bg-[#B249F3] rounded-full text-white font-semibold hover:bg-[#7d58d5]">
+            <button onClick={handleGetstartedClick} className="px-6 py-3 bg-[#B249F3] rounded-full text-white font-semibold hover:bg-[#7d58d5]">
               Get Started
             </button>
             <button className="px-6 py-3 bg-[#202022] rounded-full text-white font-semibold hover:bg-[#8b96a5]">
