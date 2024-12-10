@@ -1,3 +1,6 @@
+
+
+
 :root {
   --border-color: #482896;
   --shadow-color: #734bd4;
@@ -343,3 +346,39 @@ body[data-light="10"] .blub, body[data-light="10"] .wall-light-shadow {
 body[data-light="10"] .lamp-part.-bottom:before {
   opacity: 0;
 }
+
+/* Additions and Modifications for the Circular Color Picker */
+.color-picker-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.circular-color-picker {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: conic-gradient(red, yellow, green, cyan, blue, magenta, red); /* Full color spectrum */
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  mask: radial-gradient(circle, transparent 60%, black 100%);
+  -webkit-mask: radial-gradient(circle, transparent 60%, black 100%);
+}
+
+.color-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: white;
+  border: 2px solid black;
+  z-index: 1;
+}
+
+/* Ensure other existing components remain unaffected */
