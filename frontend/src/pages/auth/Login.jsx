@@ -6,15 +6,15 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import GoogleLogo from '../../assets/googleImg.png'
+import axiosConfig from '../../../config/axiosConfig';
 
 function Login() {
     const navigate = useNavigate();
-    const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm();
+    const [showPassword, setShowPassword] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    
+    // Use React Hook Form
+    const { register, handleSubmit, formState: { errors } } = useForm();
 
     const logoClick = () => {
         navigate("/");
@@ -24,9 +24,28 @@ function Login() {
         navigate("/signup");
     }
 
-    const onSubmit = (data) => {
-        console.log("Form Data:", data);
-        navigate("/dashboard")
+    const onSubmit = async (data) => {
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log(result);
+                // Handle successful login (e.g., save token, redirect)
+                navigate("/dashboard");
+            } else {
+                // Handle errors (e.g., show error message)
+                console.error('Login failed');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
     // Toggle function for password visibility
@@ -77,7 +96,6 @@ function Login() {
 
             <Box
                 component="form"
-                onSubmit={handleSubmit(onSubmit)}
                 sx={{
                     maxWidth: "500px",
                     padding: "20px",
@@ -90,7 +108,6 @@ function Login() {
                 <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                     <TextField
                         label="Username"
-                        InputLabelProps={{ style: { color: "white" } }}
                         {...register("username", {
                             required: "Username is required",
                             minLength: {
@@ -101,6 +118,7 @@ function Login() {
                         error={Boolean(errors.username)}
                         helperText={errors.username?.message}
                         margin="normal"
+                        InputLabelProps={{ style: { color: "white" } }}
                         InputProps={{
                             style: { color: "white" },
                         }}
@@ -124,8 +142,6 @@ function Login() {
                 <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                     <TextField
                         label="Password"
-                        type={showPassword ? "text" : "password"}  // Toggle input type between password and text
-                        InputLabelProps={{ style: { color: "white" } }}
                         {...register("password", {
                             required: "Password is required",
                             minLength: {
@@ -133,9 +149,11 @@ function Login() {
                                 message: "Password must be at least 6 characters",
                             },
                         })}
+                        type={showPassword ? "text" : "password"}
                         error={Boolean(errors.password)}
                         helperText={errors.password?.message}
                         margin="normal"
+                        InputLabelProps={{ style: { color: "white" } }}
                         InputProps={{
                             style: { color: "white" },
                             endAdornment: (
@@ -146,7 +164,7 @@ function Login() {
                                 >
                                     {showPassword ? <VisibilityOff /> : <Visibility />}
                                 </Button>
-                            ),  // Add the eye icon for toggling
+                            ),
                         }}
                         sx={{
                             mt: 2,
@@ -168,6 +186,7 @@ function Login() {
 
                 <Button
                     type="submit"
+                    onClick={handleSubmit(onSubmit)}
                     variant="contained"
                     sx={{
                         mt: 2,
@@ -180,6 +199,7 @@ function Login() {
                     fullWidth
                 >
                     Sign In
+                    {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}  {/* Conditionally render errorMessage */}
                 </Button>
 
                 {/* Divider Line with OR Text */}
@@ -213,28 +233,14 @@ function Login() {
                         onClick={signUp}
                         sx={{
                             color: "#B04AEE",
-                            "&:hover": { color: "#7C59D1" },
-                            textDecoration: "none",
-                            cursor: "pointer",  // Optional: makes it clear the text is clickable
+                            "&:hover": {
+                                textDecoration: "underline",
+                            },
                         }}
                     >
-                        Sign Up
+                        Create one
                     </Link>
                 </Box>
-
-                <Box sx={{ mt: 2, textAlign: "center" }}>
-                    <Link
-                        href="#"
-                        sx={{
-                            color: "#B04AEE",
-                            "&:hover": { color: "#7C59D1" },
-                            textDecoration: "none",
-                        }}
-                    >
-                        Forgot Password?
-                    </Link>
-                </Box>
-
             </Box>
         </div>
     );

@@ -1,10 +1,10 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, TextField, Button, Link, IconButton, InputAdornment } from "@mui/material";
 import { useForm } from "react-hook-form";
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useState } from "react";
 import GoogleLogo from '../../assets/googleImg.png'
 
 function Signup() {
@@ -18,6 +18,7 @@ function Signup() {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [error, setError] = useState("");
 
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleClickShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
@@ -35,9 +36,28 @@ function Signup() {
         // Implement Google signup logic here
     };
 
-    const onSubmit = (data) => {
-        console.log("Form Data:", data);
-        // Implement your form submission logic here
+    const onSubmit = async (data) => {
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log("Registration successful:", result);
+                navigate("/login"); // Redirect to login page after successful registration
+            } else {
+                const errorData = await response.json();
+                setError(errorData.message || "Registration failed");
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            setError("An error occurred during registration");
+        }
     };
 
     return (
@@ -50,13 +70,13 @@ function Signup() {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        marginBottom: "20px",  // Optional spacing
+                        marginBottom: "20px",
                     }}
                 >
                     <TipsAndUpdatesIcon
                         style={{
                             fontSize: "40px",
-                            color: "#B04AEE", // Matching the button color
+                            color: "#B04AEE",
                         }}
                     />
                 </div>
@@ -83,12 +103,17 @@ function Signup() {
                     maxWidth: "500px",
                     padding: "20px",
                     borderRadius: "18px",
-                    display: "flex",  // Flexbox to center content
-                    justifyContent: "center",  // Centers the form elements
-                    flexDirection: "column",  // Ensures vertical stacking
+                    display: "flex",
+                    justifyContent: "center",
+                    flexDirection: "column",
                 }}
             >
-                {/* Username Field */}
+                {error && (
+                    <Typography color="error" sx={{ mb: 2, textAlign: "center" }}>
+                        {error}
+                    </Typography>
+                )}
+
                 <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                     <TextField
                         label="Username"
@@ -113,17 +138,16 @@ function Signup() {
                                     borderColor: '#3a3a3a',
                                 },
                                 '&:hover fieldset': {
-                                    borderColor: '#7C59D1', // hover effect color
+                                    borderColor: '#7C59D1',
                                 },
                                 '&.Mui-focused fieldset': {
-                                    borderColor: '#B04AEE', // focused effect color
+                                    borderColor: '#B04AEE',
                                 },
                             },
                         }}
                     />
                 </Box>
 
-                {/* Email Field */}
                 <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                     <TextField
                         label="Email"
@@ -149,17 +173,16 @@ function Signup() {
                                     borderColor: '#3a3a3a',
                                 },
                                 '&:hover fieldset': {
-                                    borderColor: '#7C59D1', // hover effect color
+                                    borderColor: '#7C59D1',
                                 },
                                 '&.Mui-focused fieldset': {
-                                    borderColor: '#B04AEE', // focused effect color
+                                    borderColor: '#B04AEE',
                                 },
                             },
                         }}
                     />
                 </Box>
 
-                {/* Password Field */}
                 <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                     <TextField
                         label="Password"
@@ -197,17 +220,16 @@ function Signup() {
                                     borderColor: '#3a3a3a',
                                 },
                                 '&:hover fieldset': {
-                                    borderColor: '#7C59D1', // hover effect color
+                                    borderColor: '#7C59D1',
                                 },
                                 '&.Mui-focused fieldset': {
-                                    borderColor: '#B04AEE', // focused effect color
+                                    borderColor: '#B04AEE',
                                 },
                             },
                         }}
                     />
                 </Box>
 
-                {/* Confirm Password Field */}
                 <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                     <TextField
                         label="Confirm Password"
@@ -242,10 +264,10 @@ function Signup() {
                                     borderColor: '#3a3a3a',
                                 },
                                 '&:hover fieldset': {
-                                    borderColor: '#7C59D1', // hover effect color
+                                    borderColor: '#7C59D1',
                                 },
                                 '&.Mui-focused fieldset': {
-                                    borderColor: '#B04AEE', // focused effect color
+                                    borderColor: '#B04AEE',
                                 },
                             },
                         }}
@@ -261,14 +283,13 @@ function Signup() {
                         "&:hover": { backgroundColor: "#7C59D1", transform: "scale(1.01)" },
                         color: "white",
                         fontSize: '16px',
-                        textTransform: "none", // Prevents uppercase text
+                        textTransform: "none",
                     }}
                     fullWidth
                 >
                     Sign Up
                 </Button>
 
-                {/* Divider Line with OR Text */}
                 <Box sx={{ display: "flex", alignItems: "center", my: 3 }}>
                     <Box sx={{ flex: 1, borderBottom: "1px solid #3a3a3a" }} />
                     <Typography sx={{ mx: 2, color: "rgba(255, 255, 255, 0.8)" }}>or</Typography>
@@ -281,18 +302,17 @@ function Signup() {
                     sx={{
                         backgroundColor: "#3a3a3a",
                         "&:hover": {
-                            transform: "scale(1.01)",  // Scale the button by 1.2 times on hover
+                            transform: "scale(1.01)",
                         },
                         color: "white",
                         fontSize: '16px',
-                        textTransform: "none", // Prevents uppercase text
+                        textTransform: "none",
                     }}
                     fullWidth
                     startIcon={<img src={GoogleLogo} alt="Google" style={{ width: 30, height: 30 }} />}
                 >
                     Sign up with Google
                 </Button>
-
 
                 <Box mt={4} sx={{ textAlign: "center" }}>
                     <span style={{ color: 'rgba(255, 255, 255, 0.9)' }} >Already have an account? </span>
@@ -302,7 +322,7 @@ function Signup() {
                             color: "#B04AEE",
                             "&:hover": { color: "#7C59D1" },
                             textDecoration: "none",
-                            cursor: "pointer",  // Optional: makes it clear the text is clickable
+                            cursor: "pointer",
                         }}
                     >
                         Log in
@@ -314,3 +334,4 @@ function Signup() {
 }
 
 export default Signup;
+
