@@ -343,3 +343,32 @@ body[data-light="10"] .blub, body[data-light="10"] .wall-light-shadow {
 body[data-light="10"] .lamp-part.-bottom:before {
   opacity: 0;
 }
+
+/* Additions and Modifications for the Circular Color Picker */
+.color-picker-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.label-black {
+  color: black;
+}
+
+.light-controls {
+  padding: 1rem; /* Adjust padding as necessary */
+}
+
+.light-controls .mt-6 {
+  margin-top: 1rem; /* Adjust margin as necessary */
+}
+
+.light-controls .mt-4 {
+  margin-top: 0.5rem; /* Adjust margin as necessary */
+}
+
+.rectangle-display {
+  margin-top: 1rem; /* Adjust margin as necessary */
+}

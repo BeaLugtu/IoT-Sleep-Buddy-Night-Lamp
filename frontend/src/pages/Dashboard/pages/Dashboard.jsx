@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import "../styles/Dashboard.css";
+import turnOffImage from "../../../assets/turnOff.png";
+import turnOffLightImage from "../../../assets/turnOffLight.png";
+import ColorPicker from "../components/colorpicker"; // Adjust the path as necessary
 
 const Dashboard = () => {
   const [lightIntensity, setLightIntensity] = useState(5);
@@ -8,12 +11,25 @@ const Dashboard = () => {
 
   const toggleLight = () => setLightOn((prev) => !prev);
 
-  const handleColorChange = (e) => {
-    const { name, value } = e.target;
-    setColor((prev) => ({
-      ...prev,
-      [name]: Math.min(255, Math.max(0, value)), // Clamp RGB values between 0 and 255
-    }));
+  // Handles color changes from the ColorPicker component
+  const handleColorChange = useCallback(
+    (hex) => {
+      const rgb = hexToRgb(hex);
+      setColor(rgb);
+    },
+    [setColor]
+  );
+
+
+  const rgbString = `rgb(${Math.round(color.r)}, ${Math.round(color.g)}, ${Math.round(color.b)})`;
+  const fullColorString = `rgb(${color.r}, ${color.g}, ${color.b})`;
+  // Converts Hex color code to RGB
+  const hexToRgb = (hex) => {
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return { r, g, b };
   };
 
   return (
@@ -43,7 +59,7 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="content relative z-10 mt-[170px] flex items-center justify-center flex-col h-full">
+      <div className="content relative z-10 mt-[630px] flex items-center justify-center flex-col h-full">
         <div className="text-center">
           <h1 className="text-white text-4xl font-bold mb-2">Welcome to Your Dashboard</h1>
           <h4 className="text-white text-[19px] mb-6">Let’s light up your space and get started!</h4>
@@ -80,74 +96,47 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 mt-60">
             {/* First Container */}
             <div className="bg-white bg-opacity-80 shadow-md rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">Light Controls</h2>
+            <h2 className="text-xl font-semibold mb-4 label text-black">Light Controls</h2>
 
-              {/* Light Toggle Button */}
-              <button
-                onClick={toggleLight}
-                className={`flex items-center justify-center w-full px-4 py-2 rounded shadow-md ${
-                  lightOn ? "bg-green-500 text-white" : "bg-gray-300 text-black"
-                }`}
-              >
-                <span className="material-icons">
-                  {lightOn ? "toggle_on" : "toggle_off"}
-                </span>
-                <span className="ml-2">
-                  {lightOn ? "Light ON" : "Light OFF"}
-                </span>
-              </button>
-
-              {/* Color Picker UI */}
-              <div className="mt-6">
-                <h3 className="text-lg font-medium mb-2">Pick a Color</h3>
-                <input
-                  type="color"
-                  value={`#${((1 << 24) + (color.r << 16) + (color.g << 8) + color.b)
-                    .toString(16)
-                    .slice(1)}`}
-                  onChange={(e) => {
-                    const hex = e.target.value.substring(1);
-                    setColor({
-                      r: parseInt(hex.slice(0, 2), 16),
-                      g: parseInt(hex.slice(2, 4), 16),
-                      b: parseInt(hex.slice(4, 6), 16),
-                    });
+              {/* Circular Light Toggle Button */}
+              <div className="flex items-center justify-center mt-6">
+                <button
+                  onClick={toggleLight}
+                  className={`flex items-center justify-center w-16 h-16 rounded-full shadow-md transition-colors ${
+                    lightOn ? "bg-green-500" : "bg-gray-300"
+                  }`}
+                  style={{
+                    backgroundImage: lightOn
+                      ? `url(${turnOffLightImage})`
+                      : `url(${turnOffImage})`,
+                    backgroundSize: lightOn ? "100%" : "70%",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center",
                   }}
-                  className="w-20 h-20 rounded-full border shadow"
-                />
-                <div className="flex mt-4 space-x-2">
-                  <div className="flex items-center">
-                    <label className="mr-2 text-gray-700">R:</label>
-                    <input
-                      type="number"
-                      name="r"
-                      value={color.r}
-                      onChange={handleColorChange}
-                      className="w-12 border rounded text-center"
-                    />
-                  </div>
-                  <div className="flex items-center">
-                    <label className="mr-2 text-gray-700">G:</label>
-                    <input
-                      type="number"
-                      name="g"
-                      value={color.g}
-                      onChange={handleColorChange}
-                      className="w-12 border rounded text-center"
-                    />
-                  </div>
-                  <div className="flex items-center">
-                    <label className="mr-2 text-gray-700">B:</label>
-                    <input
-                      type="number"
-                      name="b"
-                      value={color.b}
-                      onChange={handleColorChange}
-                      className="w-12 border rounded text-center"
-                    />
-                  </div>
-                </div>
+                ></button>
               </div>
+
+              {/* Color Picker Component */}
+              <div className="">
+                <ColorPicker onColorChange={handleColorChange} />
+              </div>
+
+              <div className="mt-4">
+                <h3 className="text-gray-700 label">Selected Color: {rgbString}</h3>
+              </div>
+
+              {/* Rectangle displaying selected color */}
+              <div
+                className="mt-6 rectangle-display"
+                style={{
+                  width: "200px",
+                  height: "100px",
+                  backgroundColor: rgbString,  // Ensures the selected color is applied
+                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                  margin: "0 auto",
+                  borderRadius: "8px",
+                }}
+              ></div>
             </div>
 
             {/* Placeholder for Other Containers */}
