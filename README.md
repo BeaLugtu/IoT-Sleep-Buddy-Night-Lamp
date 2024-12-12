@@ -118,7 +118,7 @@ void loop() {
 
 ### 5.1 Prototype Phase:
 - Start with basic LEDs connected to an **Arduino Uno** for easy testing.
-- Use a breadboard for prototyping and jumper wires for connections.
+- Use a breadboard for prototyping and jumper wires for the connections.
 - Test the functionality of the app by connecting it to the Arduino via USB or Wi-Fi (using **ESP8266/ESP32**).
 
 ### 5.2 Final Build:
