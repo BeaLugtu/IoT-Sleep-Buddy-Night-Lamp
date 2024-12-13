@@ -25,27 +25,28 @@ function Login() {
     }
 
     const onSubmit = async (data) => {
-        try {
-            const response = await fetch('http://localhost:5000/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
+        navigate("/dashboard");
+        // try {
+        //     const response = await fetch('http://localhost:5000/api/auth/login', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify(data),
+        //     });
 
-            if (response.ok) {
-                const result = await response.json();
-                console.log(result);
-                // Handle successful login (e.g., save token, redirect)
-                navigate("/dashboard");
-            } else {
-                // Handle errors (e.g., show error message)
-                console.error('Login failed');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        //     if (response.ok) {
+        //         const result = await response.json();
+        //         console.log(result);
+        //         // Handle successful login (e.g., save token, redirect)
+        //         navigate("/dashboard");
+        //     } else {
+        //         // Handle errors (e.g., show error message)
+        //         console.error('Login failed');
+        //     }
+        // } catch (error) {
+        //     console.error('Error:', error);
+        // }
     };
 
     // Toggle function for password visibility

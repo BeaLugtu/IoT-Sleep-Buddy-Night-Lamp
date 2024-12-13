@@ -1,0 +1,51 @@
+# Node.js dependencies
+**/node_modules/
+**/npm-debug.log*
+
+# Logs
+logs/
+*.log
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+**/dist/
+**/build/
+
+# IDE and Editor-specific files
+.vscode/
+.idea/
+*.swp
+*.suo
+*.bak
+*.tmp
+*.DS_Store
+Thumbs.db
+
+# Environment files
+**/.env
+**/.env.*.local
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Dependency directories
+backend/node_modules/
+frontend/node_modules/
+
+# Specific frontend and backend outputs
+frontend/out/
+frontend/.next/
+frontend/.vercel/
+backend/.cache/
+
+# Temp files
+*.tmp
+*.lock
+*.log
+
+# Testing and coverage
+**/coverage/
+**/jest/
+**/.nyc_output/
