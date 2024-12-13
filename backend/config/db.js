@@ -1,17 +1,20 @@
-// db.js
-const { Client } = require('pg');
+const mysql = require('mysql2');
 
-// Create a new client instance with connection parameters
-const client = new Client({
-  host: 'localhost', // Use your database host
-  port: 5432, // Default port for PostgreSQL
-  user: 'xine', // The username you created
-  password: 'xine', // The password you created
-  database: 'iot' // The database you created
+// Create a new connection instance with MySQL parameters
+const connection = mysql.createConnection({
+  host: 'localhost', // Use your MySQL database host
+  user: 'root', // Replace with your MySQL username (default is 'root')
+  password: '', // Replace with your MySQL password (default is blank for phpMyAdmin)
+  database: 'smartglow' // Replace with the MySQL database name
 });
 
-client.connect()
-  .then(() => console.log('Connected to PostgreSQL'))
-  .catch(err => console.error('Connection error', err.stack));
+// Connect to the MySQL database
+connection.connect((err) => {
+  if (err) {
+    console.error('Connection error:', err.stack);
+    return;
+  }
+  console.log('Connected to MySQL');
+});
 
-module.exports = client;
+module.exports = connection;

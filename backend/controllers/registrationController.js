@@ -1,28 +1,51 @@
 const bcrypt = require('bcrypt');
-const client = require('../config/db');
+const db = require('../config/db'); // MySQL database connection
 
 async function registerUser(req, res) {
-  const { email, username, password } = req.body;  // Removed confirmPassword
+  const { email, username, password } = req.body; // Removed confirmPassword
 
   // Check if email or username already exists
   try {
-    const emailExists = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-    if (emailExists.rows.length > 0) {
-      return res.status(400).json({ message: 'Email already exists' });
-    }
+    // Check if email exists
+    db.query('SELECT * FROM users WHERE email = ?', [email], async (err, emailResults) => {
+      if (err) {
+        console.error('Database query error:', err);
+        return res.status(500).json({ message: 'Internal server error' });
+      }
 
-    const usernameExists = await client.query('SELECT * FROM users WHERE username = $1', [username]);
-    if (usernameExists.rows.length > 0) {
-      return res.status(400).json({ message: 'Username already exists' });
-    }
+      if (emailResults.length > 0) {
+        return res.status(400).json({ message: 'Email already exists' });
+      }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+      // Check if username exists
+      db.query('SELECT * FROM users WHERE username = ?', [username], async (err, usernameResults) => {
+        if (err) {
+          console.error('Database query error:', err);
+          return res.status(500).json({ message: 'Internal server error' });
+        }
 
-    // Insert new user into database
-    const result = await client.query('INSERT INTO users (email, username, password) VALUES ($1, $2, $3) RETURNING *', [email, username, hashedPassword]);
+        if (usernameResults.length > 0) {
+          return res.status(400).json({ message: 'Username already exists' });
+        }
 
-    res.status(201).json({ message: 'User created successfully', user: result.rows[0] });
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Insert new user into the database
+        db.query(
+          'INSERT INTO users (email, username, password) VALUES (?, ?, ?)',
+          [email, username, hashedPassword],
+          (err, result) => {
+            if (err) {
+              console.error('Error inserting user:', err);
+              return res.status(500).json({ message: 'Internal server error' });
+            }
+
+            res.status(201).json({ message: 'User created successfully', user: { id: result.insertId, email, username } });
+          }
+        );
+      });
+    });
   } catch (err) {
     console.error('Error during registration:', err);
     res.status(500).json({ message: 'Internal server error' });
