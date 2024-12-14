@@ -372,3 +372,64 @@ body[data-light="10"] .lamp-part.-bottom:before {
 .rectangle-display {
   margin-top: 1rem; /* Adjust margin as necessary */
 }
+
+/* start of automatic light css */
+
+/* Container 3 Lamp Styles */
+.css-lamp {
+  position: relative;
+  width: 100px;
+  height: 200px;
+  margin: 120% auto 0; /* Added top margin to push the lamp lower */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Lamp Base */
+.lamp-base {
+  width: 60px;
+  height: 20px;
+  background-color: #444;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Lamp Pole */
+.lamp-pole {
+  width: 10px;
+  height: 100px;
+  background-color: #888;
+  margin: 0 auto;
+}
+
+/* Lamp Shade */
+.lamp-shade {
+  width: 80px;
+  height: 60px;
+  background-color: #555;
+  border-radius: 0 0 40px 40px;
+  position: absolute;
+  top: -50px;  /* Adjusted top to make sure the shade appears */
+  left: 50%;  /* Center the shade horizontally */
+  transform: translateX(-50%);  /* Ensure it’s perfectly centered */
+  z-index: 2;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+
+/* Lamp Light */
+.lamp-light {
+  position: absolute;
+  top: 10px;
+  width: 60px;
+  height: 40px;
+  background-color: rgba(255, 255, 200, 0.6);
+  border-radius: 50%;
+  z-index: 1;
+  filter: blur(10px);
+  opacity: 0.8;
+}
+
+
+/* end of automatic light container */

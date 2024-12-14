@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Dashboard.css";
 import turnOffImage from "../../../assets/turnOff.png";
 import turnOffLightImage from "../../../assets/turnOffLight.png";
@@ -6,31 +6,56 @@ import ColorPicker from "../components/colorpicker"; // Adjust the path as neces
 
 const Dashboard = () => {
   const [lightIntensity, setLightIntensity] = useState(5);
-  const [lightOn, setLightOn] = useState(false);
-  const [color, setColor] = useState({ r: 255, g: 255, b: 255 });
+  const [lightOnControl, setLightOnControl] = useState(false);
+  const [lightOnContainer3, setLightOnContainer3] = useState(false);
+  const [selectedMode, setSelectedMode] = useState("Morning Mode");
+  const [lampColor, setLampColor] = useState("rgba(255, 255, 200, 0.6)");
 
-  const toggleLight = () => setLightOn((prev) => !prev);
+  const toggleLightControl = () => setLightOnControl((prev) => !prev);
+  const toggleLightContainer3 = () => setLightOnContainer3((prev) => !prev);
 
-  // Handles color changes from the ColorPicker component
-  const handleColorChange = useCallback(
-    (hex) => {
-      const rgb = hexToRgb(hex);
-      setColor(rgb);
-    },
-    [setColor]
-  );
+  const modes = ["Morning Mode", "Afternoon Mode", "Night Mode", "Midnight Mode"];
 
-
-  const rgbString = `rgb(${Math.round(color.r)}, ${Math.round(color.g)}, ${Math.round(color.b)})`;
-  const fullColorString = `rgb(${color.r}, ${color.g}, ${color.b})`;
-  // Converts Hex color code to RGB
-  const hexToRgb = (hex) => {
-    const bigint = parseInt(hex.slice(1), 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    return { r, g, b };
+  const getModeColor = (mode) => {
+    switch (mode) {
+      case "Morning Mode":
+        return "cyan";
+      case "Afternoon Mode":
+        return "yellow";
+      case "Night Mode":
+        return "rgba(255, 255, 255, 0.6)"; // Dim white
+      case "Midnight Mode":
+        return "rgba(255, 255, 200, 0.3)"; // Dim yellow
+      default:
+        return "rgba(255, 255, 200, 0.6)";
+    }
   };
+
+  const handleModeChange = (direction) => {
+    const currentIndex = modes.indexOf(selectedMode);
+    const nextIndex = (currentIndex + direction + modes.length) % modes.length;
+    setSelectedMode(modes[nextIndex]);
+  };
+
+  useEffect(() => {
+    if (lightOnContainer3) {
+      setLampColor(getModeColor(selectedMode));
+    }
+  }, [selectedMode, lightOnContainer3]);
+
+  // Automatically turn off Light Controls when Container 3 light is toggled on
+  useEffect(() => {
+    if (lightOnContainer3 && lightOnControl) {
+      setLightOnControl(false);
+    }
+  }, [lightOnContainer3]);
+
+  // Automatically turn off Container 3 when Light Controls is enabled
+  useEffect(() => {
+    if (lightOnControl && lightOnContainer3) {
+      setLightOnContainer3(false);
+    }
+  }, [lightOnControl]);
 
   return (
     <div className="dashboard relative w-full h-screen">
@@ -48,7 +73,7 @@ const Dashboard = () => {
             className="blub"
             style={{
               opacity: lightIntensity / 10,
-              backgroundColor: `rgb(${color.r}, ${color.g}, ${color.b})`,
+              backgroundColor: lampColor,
             }}
           ></div>
         </div>
@@ -96,33 +121,34 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 mt-60">
             {/* First Container */}
             <div className="bg-white bg-opacity-80 shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4 label text-black">Light Controls</h2>
-
-              {/* Circular Light Toggle Button */}
-              <div className="flex items-center justify-center mt-6">
-                <button
-                  onClick={toggleLight}
-                  className={`flex items-center justify-center w-16 h-16 rounded-full shadow-md transition-colors ${
-                    lightOn ? "bg-green-500" : "bg-gray-300"
-                  }`}
-                  style={{
-                    backgroundImage: lightOn
-                      ? `url(${turnOffLightImage})`
-                      : `url(${turnOffImage})`,
-                    backgroundSize: lightOn ? "100%" : "70%",
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center",
-                  }}
-                ></button>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  {/* Left side button for Light Controls */}
+                  <button
+                    onClick={toggleLightControl}
+                    className={`flex items-center justify-center w-16 h-16 rounded-full shadow-md transition-colors ${
+                      lightOnControl ? "bg-green-500" : "bg-gray-300"
+                    }`}
+                    style={{
+                      backgroundImage: lightOnControl
+                        ? `url(${turnOffLightImage})`
+                        : `url(${turnOffImage})`,
+                      backgroundSize: lightOnControl ? "100%" : "70%",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center",
+                    }}
+                  ></button>
+                  <h2 className="text-xl font-semibold text-black label ml-4">Light Controls</h2>
+                </div>
               </div>
 
               {/* Color Picker Component */}
               <div className="">
-                <ColorPicker onColorChange={handleColorChange} />
+                <ColorPicker onColorChange={(color) => setLampColor(color)} isDisabled={!lightOnControl} />
               </div>
 
               <div className="mt-4">
-                <h3 className="text-gray-700 label">Selected Color: {rgbString}</h3>
+                <h3 className="text-gray-700 label">Selected Color: {lampColor}</h3>
               </div>
 
               {/* Rectangle displaying selected color */}
@@ -131,7 +157,7 @@ const Dashboard = () => {
                 style={{
                   width: "200px",
                   height: "100px",
-                  backgroundColor: rgbString,  // Ensures the selected color is applied
+                  backgroundColor: lightOnControl ? lampColor : "rgb(200, 200, 200)",
                   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
                   margin: "0 auto",
                   borderRadius: "8px",
@@ -139,14 +165,61 @@ const Dashboard = () => {
               ></div>
             </div>
 
-            {/* Placeholder for Other Containers */}
+            {/* Container 2 */}
             <div className="bg-white bg-opacity-80 shadow-md rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-2">Container 2</h2>
               <p className="text-gray-700">Content for the second container goes here.</p>
             </div>
+
+            {/* Container 3 */}
             <div className="bg-white bg-opacity-80 shadow-md rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-2">Container 3</h2>
-              <p className="text-gray-700">Content for the third container goes here.</p>
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold mb-2 text-center w-full">Automatic</h2>
+                {/* Right side button for Container 3 */}
+                <button
+                  onClick={toggleLightContainer3}
+                  className={`flex items-center justify-center w-16 h-16 rounded-full shadow-md transition-colors ${
+                    lightOnContainer3 ? "bg-green-500" : "bg-gray-300"
+                  }`}
+                  style={{
+                    backgroundImage: lightOnContainer3
+                      ? `url(${turnOffLightImage})`
+                      : `url(${turnOffImage})`,
+                    backgroundSize: lightOnContainer3 ? "100%" : "70%",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center",
+                  }}
+                ></button>
+              </div>
+
+              {lightOnContainer3 && (
+                <>
+                  <div className="text-gray-700 label text-center mb-4">{selectedMode}</div>
+                  <div className="flex justify-center space-x-4">
+                    <button
+                      onClick={() => handleModeChange(-1)}
+                      className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                    >
+                      &larr;
+                    </button>
+                    <button
+                      onClick={() => handleModeChange(1)}
+                      className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                    >
+                      &rarr;
+                    </button>
+                  </div>
+                </>
+              )}
+
+              <div className="css-lamp">
+                <div className="lamp-base"></div>
+                <div className="lamp-pole"></div>
+                <div
+                  className={`lamp-shade ${lightOnContainer3 ? "light-on" : "light-off"}`}
+                  style={{ backgroundColor: lightOnContainer3 ? lampColor : "#ddd" }}
+                ></div>
+              </div>
             </div>
           </div>
         </div>

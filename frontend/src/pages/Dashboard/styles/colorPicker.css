@@ -40,5 +40,8 @@
     color: MediumSlateBlue;
   }
   
-
+  .wrap.disabled {
+    pointer-events: none; /* Prevent interactions */
+    opacity: 0.5; /* Make it visually obvious that it's disabled */
+  }
   
