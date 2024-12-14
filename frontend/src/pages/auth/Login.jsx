@@ -12,7 +12,7 @@ function Login() {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    
+
     // Use React Hook Form
     const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -25,34 +25,36 @@ function Login() {
     }
 
     const onSubmit = async (data) => {
-        try {
-            // Make the login API request
-            const response = await fetch('http://localhost:5000/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-    
-            if (response.ok) {
-                const result = await response.json();
-                console.log(result);
-                // Handle successful login (e.g., save token, redirect)
-                // Assuming result contains the token, you may want to save it to localStorage or context
-                localStorage.setItem('token', result.token); // Save the token (example)
-    
-                // Now navigate to the dashboard
-                navigate("/dashboard");
-            } else {
-                // Handle errors (e.g., show error message)
-                console.error('Login failed');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        navigate("/dashboard");
+
+        // try {
+        //     // Make the login API request
+        //     const response = await fetch('http://localhost:5000/api/auth/login', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify(data),
+        //     });
+
+        //     if (response.ok) {
+        //         const result = await response.json();
+        //         console.log(result);
+        //         // Handle successful login (e.g., save token, redirect)
+        //         // Assuming result contains the token, you may want to save it to localStorage or context
+        //         localStorage.setItem('token', result.token); // Save the token (example)
+
+        //         // Now navigate to the dashboard
+        //         navigate("/dashboard");
+        //     } else {
+        //         // Handle errors (e.g., show error message)
+        //         console.error('Login failed');
+        //     }
+        // } catch (error) {
+        //     console.error('Error:', error);
+        // }
     };
-    
+
 
     // Toggle function for password visibility
     const handleClickShowPassword = () => {
@@ -197,7 +199,7 @@ function Login() {
                     sx={{
                         mt: 2,
                         backgroundColor: "#B04AEE",
-                        "&:hover": { backgroundColor: "#7C59D1", transform: "scale(1.01)"},
+                        "&:hover": { backgroundColor: "#7C59D1", transform: "scale(1.01)" },
                         color: "white",
                         fontSize: '16px',
                         textTransform: "none", // Prevents uppercase text
