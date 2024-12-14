@@ -1,36 +1,63 @@
+import { useRef } from 'react';
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
 import WhySmartGlow from "./components/WhySmartGlow";
-import HowItWorks from "./components/HowItWorks";
+import BeUpdated from "./components/HowItWorks";
+import About from "./components/About";
 import TechNComponents from "./components/TechNComponents";
 import OurTeam from "./components/OurTeam";
 import Footer from "./components/Footer";
+
 function LandingPage() {
+  // Create references for each section
+  const aboutRef = useRef(null);
+  const featuresRef = useRef(null);
+  const howItWorksRef = useRef(null);
+  const techDetailsRef = useRef(null);
+
+  // Store all section refs in one object to pass to Header
+  const sectionsRef = {
+    about: aboutRef,
+    features: featuresRef,
+    'how-it-works': howItWorksRef,
+    'tech-details': techDetailsRef,
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <Header />
+      {/* Header with references for scroll */}
+      <Header sectionsRef={sectionsRef} />
 
-      {/* Hero Section */}
-      <Hero />
+      {/* Sections with respective refs */}
+      <section>
+        <Hero />
+      </section>
 
-      {/* About Section */}
-      <Features />
+      {/* <section ref={aboutRef}>
+        <About />
+      </section> */}
 
-      {/* About Section */}
-      <HowItWorks />
+      <section ref={featuresRef}>
+        <Features />
+      </section>
 
-      {/* TechNComponents Section */}
-      <TechNComponents />
+      <section ref={techDetailsRef}>
+        <TechNComponents />
+      </section>
 
-      {/* About Section */}
-      <WhySmartGlow />
+      <section>
+        <WhySmartGlow />
+      </section>
 
-      {/* Our Team Section */}
-      <OurTeam />
+      <section>
+        <OurTeam />
+      </section>
 
-      {/* Footer */}
+      <section ref={howItWorksRef}>
+        <BeUpdated />
+      </section>
+
       <Footer />
     </div>
   );
