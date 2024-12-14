@@ -3,6 +3,8 @@ import Hero from "./components/Hero";
 import Features from "./components/Features";
 import WhySmartGlow from "./components/WhySmartGlow";
 import HowItWorks from "./components/HowItWorks";
+import TechNComponents from "./components/TechNComponents";
+import OurTeam from "./components/OurTeam";
 import Footer from "./components/Footer";
 function LandingPage() {
   return (
@@ -19,8 +21,14 @@ function LandingPage() {
       {/* About Section */}
       <HowItWorks />
 
+      {/* TechNComponents Section */}
+      <TechNComponents />
+
       {/* About Section */}
       <WhySmartGlow />
+
+      {/* Our Team Section */}
+      <OurTeam />
 
       {/* Footer */}
       <Footer />
