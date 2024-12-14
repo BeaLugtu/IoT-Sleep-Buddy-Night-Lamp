@@ -89,6 +89,17 @@ const Dashboard = () => {
     setShowRecoverModal(false);
   };
 
+  const hexToRgb = (hex) => {
+    // Remove "#" if present
+    hex = hex.replace(/^#/, "");
+    // Parse the HEX string
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
   return (
     <div className="dashboard relative w-full h-screen">
       <div className="lamp-wrapper absolute inset-0 z-0 pointer-events-none">
@@ -174,15 +185,17 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <ColorPicker
-                onColorChange={(color) => setLampColor(color)}
-                isDisabled={!lightOnControl}
-              />
-              <div className="mt-4">
-                <h3 className="text-gray-700 label">
-                  Selected Color: {lampColor}
-                </h3>
-              </div>
+              {/* Light Controls */}
+          <ColorPicker
+            onColorChange={(color) => {
+              // If the color is in HEX, convert it to RGB
+              const rgbColor = color.startsWith("#") ? hexToRgb(color) : color;
+              setLampColor(rgbColor);
+            }}
+          />
+          <div className="mt-4">
+            <h3 className="text-gray-700 label">Selected Color: {lampColor}</h3>
+          </div>
               <div
                 className="mt-6 rectangle-display"
                 style={{
