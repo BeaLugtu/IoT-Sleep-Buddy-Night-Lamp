@@ -2,64 +2,95 @@ import React, { useState, useEffect } from "react";
 import "../styles/Dashboard.css";
 import turnOffImage from "../../../assets/turnOff.png";
 import turnOffLightImage from "../../../assets/turnOffLight.png";
-import ColorPicker from "../components/colorpicker"; // Adjust the path as necessary
+import ColorPicker from "../components/colorpicker";
+import Automatic from "../components/automaticLight";
+import Usage from "../components/usage"; // Adjust the path as necessary
 
 const Dashboard = () => {
   const [lightIntensity, setLightIntensity] = useState(5);
   const [lightOnControl, setLightOnControl] = useState(false);
   const [lightOnContainer3, setLightOnContainer3] = useState(false);
-  const [selectedMode, setSelectedMode] = useState("Morning Mode");
   const [lampColor, setLampColor] = useState("rgba(255, 255, 200, 0.6)");
+  const [activeButton, setActiveButton] = useState("History");
+  const [usageData, setUsageData] = useState([
+    {
+      id: 1,
+      mode: "Auto",
+      lightsOn: "10:00 AM",
+      lightsOff: "2:00 PM",
+      duration: "4 hrs",
+      color: "Blue",
+    },
+    {
+      id: 2,
+      mode: "Manual",
+      lightsOn: "5:00 PM",
+      lightsOff: "8:00 PM",
+      duration: "3 hrs",
+      color: "Yellow",
+    },
+  ]);
+  const [archiveData, setArchiveData] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [showRecoverModal, setShowRecoverModal] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
 
   const toggleLightControl = () => setLightOnControl((prev) => !prev);
-  const toggleLightContainer3 = () => setLightOnContainer3((prev) => !prev);
-
-  const modes = ["Morning Mode", "Afternoon Mode", "Night Mode", "Midnight Mode"];
-
-  const getModeColor = (mode) => {
-    switch (mode) {
-      case "Morning Mode":
-        return "cyan";
-      case "Afternoon Mode":
-        return "yellow";
-      case "Night Mode":
-        return "rgba(255, 255, 255, 0.6)"; // Dim white
-      case "Midnight Mode":
-        return "rgba(255, 255, 200, 0.3)"; // Dim yellow
-      default:
-        return "rgba(255, 255, 200, 0.6)";
-    }
-  };
-
-  const handleModeChange = (direction) => {
-    const currentIndex = modes.indexOf(selectedMode);
-    const nextIndex = (currentIndex + direction + modes.length) % modes.length;
-    setSelectedMode(modes[nextIndex]);
-  };
 
   useEffect(() => {
-    if (lightOnContainer3) {
-      setLampColor(getModeColor(selectedMode));
-    }
-  }, [selectedMode, lightOnContainer3]);
-
-  // Automatically turn off Light Controls when Container 3 light is toggled on
-  useEffect(() => {
-    if (lightOnContainer3 && lightOnControl) {
-      setLightOnControl(false);
-    }
+    if (lightOnContainer3 && lightOnControl) setLightOnControl(false);
   }, [lightOnContainer3]);
 
-  // Automatically turn off Container 3 when Light Controls is enabled
   useEffect(() => {
-    if (lightOnControl && lightOnContainer3) {
-      setLightOnContainer3(false);
-    }
+    if (lightOnControl && lightOnContainer3) setLightOnContainer3(false);
   }, [lightOnControl]);
+
+  const handleDelete = (id) => {
+    const rowToDelete = usageData.find((row) => row.id === id);
+    if (rowToDelete) {
+      setSelectedRow(rowToDelete);
+      setShowModal(true);
+    }
+  };
+
+  const confirmDelete = () => {
+    if (selectedRow) {
+      setUsageData((prev) => prev.filter((row) => row.id !== selectedRow.id));
+      setArchiveData((prev) => [...prev, selectedRow]);
+      setSelectedRow(null);
+    }
+    setShowModal(false);
+  };
+
+  const cancelDelete = () => {
+    setSelectedRow(null);
+    setShowModal(false);
+  };
+
+  const handleRecover = (id) => {
+    const rowToRecover = archiveData.find((row) => row.id === id);
+    if (rowToRecover) {
+      setSelectedRow(rowToRecover);
+      setShowRecoverModal(true);
+    }
+  };
+
+  const confirmRecover = () => {
+    if (selectedRow) {
+      setArchiveData((prev) => prev.filter((row) => row.id !== selectedRow.id));
+      setUsageData((prev) => [...prev, selectedRow]);
+      setSelectedRow(null);
+    }
+    setShowRecoverModal(false);
+  };
+
+  const cancelRecover = () => {
+    setSelectedRow(null);
+    setShowRecoverModal(false);
+  };
 
   return (
     <div className="dashboard relative w-full h-screen">
-      {/* Lamp Background */}
       <div className="lamp-wrapper absolute inset-0 z-0 pointer-events-none">
         <div className="lamp-rope"></div>
         <div className="lamp">
@@ -83,17 +114,19 @@ const Dashboard = () => {
         ></div>
       </div>
 
-      {/* Main Content */}
       <div className="content relative z-10 mt-[630px] flex items-center justify-center flex-col h-full">
         <div className="text-center">
-          <h1 className="text-white text-4xl font-bold mb-2">Welcome to Your Dashboard</h1>
-          <h4 className="text-white text-[19px] mb-6">Let’s light up your space and get started!</h4>
+          <h1 className="text-white text-4xl font-bold mb-2">
+            Welcome to Your Dashboard
+          </h1>
+          <h4 className="text-white text-[19px] mb-6">
+            Let’s light up your space and get started!
+          </h4>
 
-          {/* Lamp Slider */}
           <div className="flex justify-center items-center mb-24">
             <form
               className="formLamp lamp-slider"
-              onInput={(e) => setLightIntensity(e.target.value)}
+              onInput={(e) => setLightIntensity(Number(e.target.value))}
             >
               <div className="icon sun mx-auto mb-4">
                 <div className="ray"></div>
@@ -111,19 +144,16 @@ const Dashboard = () => {
                 value={lightIntensity}
                 min="0"
                 max="10"
-                onChange={(e) => setLightIntensity(e.target.value)}
+                onChange={(e) => setLightIntensity(Number(e.target.value))}
                 className="w-full max-w-xs"
               />
             </form>
           </div>
 
-          {/* Container Boxes */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 mt-60">
-            {/* First Container */}
             <div className="bg-white bg-opacity-80 shadow-md rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
-                  {/* Left side button for Light Controls */}
                   <button
                     onClick={toggleLightControl}
                     className={`flex items-center justify-center w-16 h-16 rounded-full shadow-md transition-colors ${
@@ -133,31 +163,34 @@ const Dashboard = () => {
                       backgroundImage: lightOnControl
                         ? `url(${turnOffLightImage})`
                         : `url(${turnOffImage})`,
-                      backgroundSize: lightOnControl ? "100%" : "70%",
+                      backgroundSize: "contain",
                       backgroundRepeat: "no-repeat",
                       backgroundPosition: "center",
                     }}
                   ></button>
-                  <h2 className="text-xl font-semibold text-black label ml-4">Light Controls</h2>
+                  <h2 className="text-xl font-semibold text-black label ml-4">
+                    Light Controls
+                  </h2>
                 </div>
               </div>
 
-              {/* Color Picker Component */}
-              <div className="">
-                <ColorPicker onColorChange={(color) => setLampColor(color)} isDisabled={!lightOnControl} />
-              </div>
-
+              <ColorPicker
+                onColorChange={(color) => setLampColor(color)}
+                isDisabled={!lightOnControl}
+              />
               <div className="mt-4">
-                <h3 className="text-gray-700 label">Selected Color: {lampColor}</h3>
+                <h3 className="text-gray-700 label">
+                  Selected Color: {lampColor}
+                </h3>
               </div>
-
-              {/* Rectangle displaying selected color */}
               <div
                 className="mt-6 rectangle-display"
                 style={{
                   width: "200px",
                   height: "100px",
-                  backgroundColor: lightOnControl ? lampColor : "rgb(200, 200, 200)",
+                  backgroundColor: lightOnControl
+                    ? lampColor
+                    : "rgb(200, 200, 200)",
                   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
                   margin: "0 auto",
                   borderRadius: "8px",
@@ -165,65 +198,76 @@ const Dashboard = () => {
               ></div>
             </div>
 
-            {/* Container 2 */}
-            <div className="bg-white bg-opacity-80 shadow-md rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-2">Container 2</h2>
-              <p className="text-gray-700">Content for the second container goes here.</p>
-            </div>
+            <Usage
+              usageData={usageData}
+              archiveData={archiveData}
+              activeButton={activeButton}
+              setActiveButton={setActiveButton}
+              handleDelete={handleDelete}
+              handleRecover={handleRecover}
+            />
 
-            {/* Container 3 */}
-            <div className="bg-white bg-opacity-80 shadow-md rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold mb-2 text-center w-full">Automatic</h2>
-                {/* Right side button for Container 3 */}
-                <button
-                  onClick={toggleLightContainer3}
-                  className={`flex items-center justify-center w-16 h-16 rounded-full shadow-md transition-colors ${
-                    lightOnContainer3 ? "bg-green-500" : "bg-gray-300"
-                  }`}
-                  style={{
-                    backgroundImage: lightOnContainer3
-                      ? `url(${turnOffLightImage})`
-                      : `url(${turnOffImage})`,
-                    backgroundSize: lightOnContainer3 ? "100%" : "70%",
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center",
-                  }}
-                ></button>
-              </div>
-
-              {lightOnContainer3 && (
-                <>
-                  <div className="text-gray-700 label text-center mb-4">{selectedMode}</div>
-                  <div className="flex justify-center space-x-4">
-                    <button
-                      onClick={() => handleModeChange(-1)}
-                      className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-                    >
-                      &larr;
-                    </button>
-                    <button
-                      onClick={() => handleModeChange(1)}
-                      className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-                    >
-                      &rarr;
-                    </button>
-                  </div>
-                </>
-              )}
-
-              <div className="css-lamp">
-                <div className="lamp-base"></div>
-                <div className="lamp-pole"></div>
-                <div
-                  className={`lamp-shade ${lightOnContainer3 ? "light-on" : "light-off"}`}
-                  style={{ backgroundColor: lightOnContainer3 ? lampColor : "#ddd" }}
-                ></div>
-              </div>
-            </div>
+            <Automatic
+              lampColor={lampColor}
+              setLampColor={setLampColor}
+              lightOnContainer3={lightOnContainer3}
+              setLightOnContainer3={setLightOnContainer3}
+            />
           </div>
         </div>
       </div>
+
+      {showModal && (
+        <div
+          className="modal-overlay"
+          onClick={(e) =>
+            e.target.className === "modal-overlay" && cancelDelete()
+          }
+        >
+          <div className="modal-content">
+            <div className="modal-header">
+              <button className="close-modal" onClick={cancelDelete}>
+                X
+              </button>
+              <h3>Are you sure you want to delete this item?</h3>
+            </div>
+            <div className="modal-body">
+              <button className="btn-confirm" onClick={confirmDelete}>
+                Yes
+              </button>
+              <button className="btn-cancel" onClick={cancelDelete}>
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRecoverModal && (
+        <div
+          className="modal-overlay"
+          onClick={(e) =>
+            e.target.className === "modal-overlay" && cancelRecover()
+          }
+        >
+          <div className="modal-content">
+            <div className="modal-header">
+              <button className="close-modal" onClick={cancelRecover}>
+                X
+              </button>
+              <h3>Are you sure you want to recover this item?</h3>
+            </div>
+            <div className="modal-body">
+              <button className="btn-confirm" onClick={confirmRecover}>
+                Yes
+              </button>
+              <button className="btn-cancel" onClick={cancelRecover}>
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
