@@ -1,88 +1,86 @@
-const db = require('../config/db'); // Database connection
+const connection = require('../config/db'); // Database connection
 
-// Insert a new light activity for a user
-const insertActivity = (userId, lightOnTime, lightOffTime, duration, color, mode) => {
-  const query = `
-    INSERT INTO light_activities (user_id, light_on_time, light_off_time, duration, color, mode, is_archived)
-    VALUES (?, ?, ?, ?, ?, ?, FALSE);
-  `;
+// Step 1: Turn Light On (Manual Mode) - POST request
+exports.turnLightOn = (req, res) => {
+  const { user_id } = req.body;
+  const light_on_time = new Date().toISOString();
+  const color = { r: 255, g: 255, b: 255 }; // Default white color
+  const mode = 'manual';
 
-  // Ensure color is in correct format as a single RGB object
-  const colorString = JSON.stringify(color); // convert the RGB object to a JSON string for storage
-
-  db.query(query, [userId, lightOnTime, lightOffTime, duration, colorString, mode], (err, result) => {
+  const query = 'INSERT INTO light_activities (user_id, light_on_time, color, mode) VALUES (?, ?, ?, ?)';
+  connection.query(query, [user_id, light_on_time, JSON.stringify(color), mode], (err, result) => {
     if (err) {
-      console.error('Error inserting activity:', err);
-      return;
+      console.error(err);
+      return res.status(500).json({ message: 'Server error' });
     }
-    console.log('Activity inserted for user:', userId);
+
+    const newLightActivity = {
+      id: result.insertId,
+      user_id,
+      light_on_time,
+      color
+    };
+
+    res.json(newLightActivity);
   });
 };
 
-// Get active light activities (not archived) for a specific user
-const getActiveActivities = (userId, callback) => {
-  const query = `
-    SELECT * FROM light_activities WHERE user_id = ? AND is_archived = FALSE;
-  `;
-  
-  db.query(query, [userId], (err, result) => {
+
+// Step 3: Update the color in manual mode (PUT request)
+exports.updateColor = (req, res) => {
+  const { id, color } = req.body;  // Color will be in RGB format {r, g, b}
+
+  const query = 'UPDATE light_activities SET color = ? WHERE id = ?';
+  connection.query(query, [JSON.stringify(color), id], (err, result) => {
     if (err) {
-      console.error('Error fetching active activities:', err);
-      return;
+      console.error(err);
+      return res.status(500).json({ message: 'Server error' });
     }
-    callback(result); // return the result through the callback function
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Activity not found' });
+    }
+
+    res.json({ id, color });
   });
 };
 
-// Get archived light activities for a specific user
-const getArchivedActivities = (userId, callback) => {
-  const query = `
-    SELECT * FROM light_activities WHERE user_id = ? AND is_archived = TRUE;
-  `;
-  
-  db.query(query, [userId], (err, result) => {
+
+// Step 4: Turn off the light and calculate duration in manual mode
+// Step 4: Turn Light Off and calculate duration in manual mode (PUT request)
+exports.turnLightOff = (req, res) => {
+  const { id } = req.body;
+  const light_off_time = new Date().toISOString();
+
+  // Get the light_on_time from the database first
+  const selectQuery = 'SELECT light_on_time FROM light_activities WHERE id = ?';
+  connection.query(selectQuery, [id], (err, results) => {
     if (err) {
-      console.error('Error fetching archived activities:', err);
-      return;
+      console.error(err);
+      return res.status(500).json({ message: 'Server error' });
     }
-    callback(result); // return the result through the callback function
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Activity not found' });
+    }
+
+    const light_on_time = results[0].light_on_time;
+    const durationInSeconds = Math.floor((new Date(light_off_time) - new Date(light_on_time)) / 1000); // Duration in seconds
+
+    // Convert duration to HH:MM:SS format
+    const formattedDuration = formatDuration(durationInSeconds);
+
+    // Update the light_off_time and duration in seconds
+    const updateQuery = 'UPDATE light_activities SET light_off_time = ?, duration = ? WHERE id = ?';
+    connection.query(updateQuery, [light_off_time, durationInSeconds, id], (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Server error' });
+      }
+
+      res.json({ id, light_off_time, formattedDuration });
+    });
   });
 };
 
-// Archive an activity (mark as archived)
-const archiveActivity = (userId, activityId) => {
-  const query = `
-    UPDATE light_activities SET is_archived = TRUE WHERE id = ? AND user_id = ?;
-  `;
-  
-  db.query(query, [activityId, userId], (err, result) => {
-    if (err) {
-      console.error('Error archiving activity:', err);
-      return;
-    }
-    console.log('Activity archived for user:', userId);
-  });
-};
 
-// Delete an activity permanently
-const deleteActivity = (userId, activityId) => {
-  const query = `
-    DELETE FROM light_activities WHERE id = ? AND user_id = ?;
-  `;
-  
-  db.query(query, [activityId, userId], (err, result) => {
-    if (err) {
-      console.error('Error deleting activity:', err);
-      return;
-    }
-    console.log('Activity deleted for user:', userId);
-  });
-};
-
-module.exports = {
-  insertActivity,
-  getActiveActivities,
-  getArchivedActivities,
-  archiveActivity,
-  deleteActivity
-};
