@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import turnOffImage from "../../../assets/turnOff.png";
 import turnOffLightImage from "../../../assets/turnOffLight.png";
 
-const Container3 = ({ lampColor, setLampColor, lightOnContainer3, setLightOnContainer3 }) => {
+const Automatic = ({ lampColor, setLampColor, lightOnContainer3, setLightOnContainer3 }) => {
   const [selectedMode, setSelectedMode] = useState("Morning Mode");
 
   const modes = ["Morning Mode", "Afternoon Mode", "Night Mode", "Midnight Mode"];
@@ -28,17 +28,32 @@ const Container3 = ({ lampColor, setLampColor, lightOnContainer3, setLightOnCont
     setSelectedMode(modes[nextIndex]);
   };
 
-  const toggleLightContainer3 = () => setLightOnContainer3((prev) => !prev);
-
   useEffect(() => {
     if (lightOnContainer3) {
       setLampColor(getModeColor(selectedMode));
     }
-  }, [selectedMode, lightOnContainer3]);
+  }, [selectedMode, lightOnContainer3, setLampColor]);
 
   return (
     <div className="bg-white bg-opacity-80 shadow-md rounded-lg p-6">
-      <h2 className="text-xl font-semibold mb-2">Container 3</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold mb-2 text-center w-full">Automatic</h2>
+        <button
+          onClick={() => setLightOnContainer3((prev) => !prev)}
+          className={`flex items-center justify-center w-16 h-16 rounded-full shadow-md transition-colors ${
+            lightOnContainer3 ? "bg-green-500" : "bg-gray-300"
+          }`}
+          style={{
+            backgroundImage: lightOnContainer3
+              ? `url(${turnOffLightImage})`
+              : `url(${turnOffImage})`,
+            backgroundSize: lightOnContainer3 ? "100%" : "70%",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+          }}
+        ></button>
+      </div>
+
       {lightOnContainer3 && (
         <>
           <div className="text-gray-700 label text-center mb-4">{selectedMode}</div>
@@ -58,37 +73,27 @@ const Container3 = ({ lampColor, setLampColor, lightOnContainer3, setLightOnCont
           </div>
         </>
       )}
+
       <div className="css-lamp">
         <div className="lamp-base"></div>
         <div className="lamp-pole"></div>
         <div
-          className={`lamp-shade ${lightOnContainer3 ? "light-on" : "light-off"}`}
-          style={{ backgroundColor: lightOnContainer3 ? lampColor : "#555" }}
-        ></div>
-        <div
-          className={`lamp-light ${lightOnContainer3 ? "light-on" : "light-off"}`}
-          style={{ backgroundColor: lightOnContainer3 ? lampColor : "transparent" }}
-        ></div>
-      </div>
-
-      <div className="flex items-center justify-center mt-6">
-        <button
-          onClick={toggleLightContainer3}
-          className={`flex items-center justify-center w-16 h-16 rounded-full shadow-md transition-colors ${
-            lightOnContainer3 ? "bg-green-500" : "bg-gray-300"
-          }`}
+          className="lamp-shade"
           style={{
-            backgroundImage: lightOnContainer3
-              ? `url(${turnOffLightImage})`
-              : `url(${turnOffImage})`,
-            backgroundSize: lightOnContainer3 ? "100%" : "70%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
+            backgroundColor: lightOnContainer3 ? lampColor : "#555", // Default shade color is #555
           }}
-        ></button>
+        ></div>
+        {lightOnContainer3 && (
+          <div
+            className="lamp-light"
+            style={{
+              backgroundColor: lampColor, // Update lamp light color based on the current mode
+            }}
+          ></div>
+        )}
       </div>
     </div>
   );
 };
 
-export default Container3;
+export default Automatic;
