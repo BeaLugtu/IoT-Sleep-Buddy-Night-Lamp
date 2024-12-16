@@ -91,6 +91,101 @@ exports.turnLightOff = (req, res) => {
   });
 };
 
+// Turn light on in automatic mode
+exports.turnLightOnAutomatic = (req, res) => {
+  const { user_id } = req.body;
+  const light_on_time = new Date().toISOString(); // Get current UTC time
+  
+  // Get the current hour in PHT (UTC+8)
+  const currentHour = new Date().getUTCHours() + 8;
+
+  let light_mode;
+  let color;
+
+  // Determine light_mode and fixed color based on the time
+  if (currentHour >= 6 && currentHour < 12) {
+    light_mode = 'morning';
+    color = { r: 255, g: 223, b: 186 }; // Soft warm light
+  } else if (currentHour >= 12 && currentHour < 18) {
+    light_mode = 'afternoon';
+    color = { r: 255, g: 255, b: 224 }; // Neutral daylight
+  } else if (currentHour >= 18 && currentHour < 21) {
+    light_mode = 'evening';
+    color = { r: 255, g: 183, b: 178 }; // Soft red hue
+  } else {
+    light_mode = 'midnight';
+    color = { r: 192, g: 192, b: 192 }; // Dim gray light
+  }
+
+  const mode = 'automatic'; // Set mode as automatic
+
+  // Insert the light activity into the database
+  const insertQuery = `
+    INSERT INTO light_activities (user_id, light_on_time, mode, light_mode, color)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+  connection.query(insertQuery, [user_id, light_on_time, mode, light_mode, JSON.stringify(color)], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+
+    // Convert light_on_time to PHT for display
+    const localLightOnTime = convertUTCToPHT(light_on_time);
+
+    res.json({
+      id: result.insertId,
+      user_id,
+      light_on_time: localLightOnTime,
+      mode,
+      light_mode,
+      color
+    });
+  });
+};
+
+
+// Turn light off in automatic mode
+exports.turnLightOffAutomatic = (req, res) => {
+  const { id } = req.body;
+  const light_off_time = new Date().toISOString(); // Get current UTC time
+
+  // Fetch the light_on_time from the database
+  const selectQuery = 'SELECT light_on_time FROM light_activities WHERE id = ?';
+  connection.query(selectQuery, [id], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Activity not found' });
+    }
+
+    const light_on_time = results[0].light_on_time;
+    const durationInSeconds = Math.floor((new Date(light_off_time) - new Date(light_on_time)) / 1000);
+
+    // Convert duration to HH:MM:SS format
+    const formattedDuration = formatDuration(durationInSeconds);
+
+    // Update the light_off_time and duration in the database
+    const updateQuery = 'UPDATE light_activities SET light_off_time = ?, duration = ? WHERE id = ?';
+    connection.query(updateQuery, [light_off_time, durationInSeconds, id], (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Server error' });
+      }
+
+      const localLightOffTime = convertUTCToPHT(light_off_time);
+      res.json({ id, light_off_time: localLightOffTime, formattedDuration });
+    });
+  });
+};
+
+
+
+
 // History: Get all light activities for a specific user
 exports.getHistory = (req, res) => {
   const { user_id } = req.params; // Get the user_id from the request parameters

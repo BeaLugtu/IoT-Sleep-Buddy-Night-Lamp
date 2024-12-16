@@ -3,6 +3,7 @@ import "../styles/Dashboard.css";
 import turnOffImage from "../../../assets/turnOff.png";
 import turnOffLightImage from "../../../assets/turnOffLight.png";
 import ColorPicker from "../components/colorpicker"; // Adjust the path as necessary
+import axiosInstance from "../../../../config/axiosConfig";
 
 const Dashboard = () => {
   const [lightIntensity, setLightIntensity] = useState(5);
@@ -11,9 +12,86 @@ const Dashboard = () => {
   const [selectedMode, setSelectedMode] = useState("Morning Mode");
   const [lampColor, setLampColor] = useState("rgba(255, 255, 200, 0.6)");
 
-  const toggleLightControl = () => setLightOnControl((prev) => !prev);
-  const toggleLightContainer3 = () => setLightOnContainer3((prev) => !prev);
-
+  const toggleLightControl = async () => {
+    const userId = localStorage.getItem('user_id'); // Get user_id dynamically
+    const lightActivityId = localStorage.getItem('light_activity_id'); // Store 'id' for ongoing activity
+  
+    if (!userId) {
+      console.error("User ID not found in localStorage");
+      return;
+    }
+  
+    try {
+      if (lightOnControl) {
+        // TURN LIGHT OFF
+        const response = await axiosInstance.put("/api/auth/turnLightOff", { id: lightActivityId });
+  
+        const result = response.data;
+        console.log("Light turned OFF:", result);
+  
+        // Clear the stored light_activity_id
+        localStorage.removeItem("light_activity_id");
+  
+        // Update UI
+        setLightOnControl(false);
+      } else {
+        // TURN LIGHT ON
+        const response = await axiosInstance.post("/api/auth/turnLightOn", { user_id: userId });
+  
+        const result = response.data;
+        console.log("Light turned ON:", result);
+  
+        // Store the activity ID in localStorage for future updates
+        localStorage.setItem("light_activity_id", result.id);
+  
+        // Update UI
+        setLightOnControl(true);
+      }
+    } catch (error) {
+      console.error("Error toggling light:", error.response ? error.response.data : error.message);
+    }
+  };
+  
+  const toggleLightContainer3 = async () => {
+    const userId = localStorage.getItem('user_id'); // Get user ID dynamically
+    const lightActivityId = localStorage.getItem('light_activity_id'); // Store ongoing activity ID
+  
+    if (!userId) {
+      console.error("User ID not found in localStorage");
+      return;
+    }
+  
+    try {
+      if (lightOnContainer3) {
+        // TURN LIGHT OFF in AUTOMATIC MODE
+        const response = await axiosInstance.put("/api/auth/autoTurnLightOff", { id: lightActivityId });
+  
+        const result = response.data;
+        console.log("Automatic light turned OFF:", result);
+  
+        // Clear the stored light_activity_id from localStorage
+        localStorage.removeItem("light_activity_id");
+  
+        // Update UI state
+        setLightOnContainer3(false);
+      } else {
+        // TURN LIGHT ON in AUTOMATIC MODE
+        const response = await axiosInstance.post("/api/auth/autoTurnLightOn", { user_id: userId });
+  
+        const result = response.data;
+        console.log("Automatic light turned ON:", result);
+  
+        // Store the activity ID in localStorage for future updates
+        localStorage.setItem("light_activity_id", result.id);
+  
+        // Update UI state
+        setLightOnContainer3(true);
+      }
+    } catch (error) {
+      console.error("Error toggling automatic light:", error.response ? error.response.data : error.message);
+    }
+  };
+  
   const modes = ["Morning Mode", "Afternoon Mode", "Night Mode", "Midnight Mode"];
 
   const getModeColor = (mode) => {
@@ -56,6 +134,9 @@ const Dashboard = () => {
       setLightOnContainer3(false);
     }
   }, [lightOnControl]);
+
+
+  
 
   return (
     <div className="dashboard relative w-full h-screen">
