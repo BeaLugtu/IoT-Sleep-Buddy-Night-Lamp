@@ -76,7 +76,7 @@ const Dashboard = () => {
     }
   };
   
-  const toggleLightContainer3 = async () => {
+  const toggleLightOnContainer3 = async () => {
     const userId = localStorage.getItem('user_id'); // Get user ID dynamically
     const lightActivityId = localStorage.getItem('light_activity_id'); // Store ongoing activity ID
   
@@ -116,28 +116,7 @@ const Dashboard = () => {
     }
   };
   
-  const modes = ["Morning Mode", "Afternoon Mode", "Night Mode", "Midnight Mode"];
 
-  const getModeColor = (mode) => {
-    switch (mode) {
-      case "Morning Mode":
-        return "cyan";
-      case "Afternoon Mode":
-        return "yellow";
-      case "Night Mode":
-        return "rgba(255, 255, 255, 0.6)"; // Dim white
-      case "Midnight Mode":
-        return "rgba(255, 255, 200, 0.3)"; // Dim yellow
-      default:
-        return "rgba(255, 255, 200, 0.6)";
-    }
-  };
-
-  const handleModeChange = (direction) => {
-    const currentIndex = modes.indexOf(selectedMode);
-    const nextIndex = (currentIndex + direction + modes.length) % modes.length;
-    setSelectedMode(modes[nextIndex]);
-  };
 
   useEffect(() => {
     if (lightOnContainer3 && lightOnControl) setLightOnControl(false);
