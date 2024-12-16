@@ -241,40 +241,28 @@ exports.archiveActivity = (req, res) => {
   });
 };
 
+// Recover in the Frontend
+// Unarchive a light activity (set archived = 0)
+exports.unarchiveActivity = (req, res) => {
+  const { id } = req.params; // Get the activity id from the request URL
 
-// Delete a light activity permanently (from archived)
-exports.deleteActivity = (req, res) => {
-  const { id } = req.params; // Get the activity id from the request parameters
-
-  // Query to check if the activity is archived
-  const checkArchivedQuery = 'SELECT archived FROM light_activities WHERE id = ?';
-  connection.query(checkArchivedQuery, [id], (err, results) => {
+  // Query to set the activity as unarchived (archived = 0)
+  const updateQuery = 'UPDATE light_activities SET archived = 0 WHERE id = ?';
+  connection.query(updateQuery, [id], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Server error' });
     }
 
-    if (results.length === 0) {
+    if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Activity not found' });
     }
 
-    const { archived } = results[0];
-    if (archived !== 1) {
-      return res.status(400).json({ message: 'Activity is not archived. Only archived activities can be deleted.' });
-    }
-
-    // Proceed to delete the activity if it is archived
-    const deleteQuery = 'DELETE FROM light_activities WHERE id = ?';
-    connection.query(deleteQuery, [id], (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Server error' });
-      }
-
-      res.json({ message: 'Activity deleted permanently' });
-    });
+    // Return a success message
+    res.json({ message: 'Activity restored to history' });
   });
 };
+
 
 
 

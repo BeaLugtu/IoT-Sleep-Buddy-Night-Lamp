@@ -26,8 +26,11 @@ router.get('/archived/:user_id' ,lightActivityController.getArchived);
 // Route for archiving a light activity
 router.put('/archiveActivity/:id' , lightActivityController.archiveActivity);
 
-// Route for deleting a light activity
-router.delete('/deleteActivity/:id' , lightActivityController.deleteActivity);
+// Route for unarchiving a light activity
+router.put('/unarchiveActivity/:id' , lightActivityController.unarchiveActivity);
+
+
+
 
 
 
