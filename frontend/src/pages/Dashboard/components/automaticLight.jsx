@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axiosInstance from "../../../../config/axiosConfig";
 import turnOffImage from "../../../assets/turnOff.png";
 import turnOffLightImage from "../../../assets/turnOffLight.png";
 
@@ -28,6 +29,46 @@ const Automatic = ({ lampColor, setLampColor, lightOnContainer3, setLightOnConta
     setSelectedMode(modes[nextIndex]);
   };
 
+  const toggleLightOnContainer3 = async () => {
+    const userId = localStorage.getItem("user_id"); // Get user ID dynamically
+    const lightActivityId = localStorage.getItem("light_activity_id"); // Store ongoing activity ID
+
+    if (!userId) {
+      console.error("User ID not found in localStorage");
+      return;
+    }
+
+    try {
+      if (lightOnContainer3) {
+        // TURN LIGHT OFF in AUTOMATIC MODE
+        const response = await axiosInstance.put("/api/auth/autoTurnLightOff", { id: lightActivityId });
+
+        const result = response.data;
+        console.log("Automatic light turned OFF:", result);
+
+        // Clear the stored light_activity_id from localStorage
+        localStorage.removeItem("light_activity_id");
+
+        // Update UI state
+        setLightOnContainer3(false);
+      } else {
+        // TURN LIGHT ON in AUTOMATIC MODE
+        const response = await axiosInstance.post("/api/auth/autoTurnLightOn", { user_id: userId });
+
+        const result = response.data;
+        console.log("Automatic light turned ON:", result);
+
+        // Store the activity ID in localStorage for future updates
+        localStorage.setItem("light_activity_id", result.id);
+
+        // Update UI state
+        setLightOnContainer3(true);
+      }
+    } catch (error) {
+      console.error("Error toggling automatic light:", error.response ? error.response.data : error.message);
+    }
+  };
+
   useEffect(() => {
     if (lightOnContainer3) {
       setLampColor(getModeColor(selectedMode));
@@ -39,7 +80,7 @@ const Automatic = ({ lampColor, setLampColor, lightOnContainer3, setLightOnConta
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold mb-2 text-center w-full">Automatic</h2>
         <button
-          onClick={() => setLightOnContainer3((prev) => !prev)}
+          onClick={toggleLightOnContainer3} // Trigger the backend API on toggle
           className={`flex items-center justify-center w-16 h-16 rounded-full shadow-md transition-colors ${
             lightOnContainer3 ? "bg-green-500" : "bg-gray-300"
           }`}

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import "../styles/Dashboard.css";
 import turnOffImage from "../../../assets/turnOff.png";
 import turnOffLightImage from "../../../assets/turnOffLight.png";
-import ColorPicker from "../components/colorpicker";
+import ColorPicker from "../components/colorpicker"; // Adjust the path as necessary
+import axiosInstance from "../../../../config/axiosConfig";
 import Automatic from "../components/automaticLight";
 import Usage from "../components/usage"; // Adjust the path as necessary
 
@@ -35,7 +36,46 @@ const Dashboard = () => {
   const [showRecoverModal, setShowRecoverModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
-  const toggleLightControl = () => setLightOnControl((prev) => !prev);
+  const toggleLightControl = async () => {
+    const userId = localStorage.getItem('user_id'); // Get user_id dynamically
+    const lightActivityId = localStorage.getItem('light_activity_id'); // Store 'id' for ongoing activity
+  
+    if (!userId) {
+      console.error("User ID not found in localStorage");
+      return;
+    }
+  
+    try {
+      if (lightOnControl) {
+        // TURN LIGHT OFF
+        const response = await axiosInstance.put("/api/auth/turnLightOff", { id: lightActivityId });
+  
+        const result = response.data;
+        console.log("Light turned OFF:", result);
+  
+        // Clear the stored light_activity_id
+        localStorage.removeItem("light_activity_id");
+  
+        // Update UI
+        setLightOnControl(false);
+      } else {
+        // TURN LIGHT ON
+        const response = await axiosInstance.post("/api/auth/turnLightOn", { user_id: userId });
+  
+        const result = response.data;
+        console.log("Light turned ON:", result);
+  
+        // Store the activity ID in localStorage for future updates
+        localStorage.setItem("light_activity_id", result.id);
+  
+        // Update UI
+        setLightOnControl(true);
+      }
+    } catch (error) {
+      console.error("Error toggling light:", error.response ? error.response.data : error.message);
+    }
+  };
+  
 
   useEffect(() => {
     if (lightOnContainer3 && lightOnControl) setLightOnControl(false);

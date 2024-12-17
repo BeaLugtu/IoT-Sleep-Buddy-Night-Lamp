@@ -6,6 +6,7 @@ import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
 import DashboardRoutes from './pages/Dashboard/DashboardRoutes';
 
+
 function App() {
   return (
     <Router>
@@ -14,11 +15,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Dashboard Routes */}
-        <Route
-          path="/*"
-          element={<DashboardRoutes />}
-        />
+        {/* Protect Dashboard Routes */}
+        <Route>
+          <Route path="/*" element={<DashboardRoutes />} />
+        </Route>
 
       </Routes>
     </Router>

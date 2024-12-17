@@ -1,10 +1,9 @@
-require('dotenv').config(); // Ensure this is at the top of your entry file
+require('dotenv').config();
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const db = require('../config/db'); // Database connection
+const db = require('../config/db'); // Your existing database connection
 
-// Handle login requests
 exports.login = async (req, res) => {
   const { username, password } = req.body;
 
@@ -15,7 +14,7 @@ exports.login = async (req, res) => {
       if (err) {
         console.error('Database query error:', err);
         return res.status(500).json({ message: 'Server error' });
-      }
+      } 
 
       const user = results[0];
 
@@ -27,7 +26,6 @@ exports.login = async (req, res) => {
       // Compare the provided password with the stored hashed password
       const isMatch = await bcrypt.compare(password, user.password);
 
-      // If password doesn't match, return an error
       if (!isMatch) {
         return res.status(400).json({ message: 'Invalid username or password' });
       }
@@ -44,11 +42,16 @@ exports.login = async (req, res) => {
         { expiresIn: '1h' }
       );
 
-      // Send the success response with the token
-      res.status(200).json({ message: 'Login successful', token });
+      // Send the success response with the token and user ID
+      res.status(200).json({
+        message: 'Login successful',
+        token,
+        user_id: user.id
+      });
     });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
