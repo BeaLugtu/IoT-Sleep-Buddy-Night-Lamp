@@ -1,7 +1,14 @@
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Facebook, Instagram, Twitter, GitHub, YouTube } from '@mui/icons-material';
 import { Divider } from '@mui/material';
 
 function Footer() {
+  const navigate = useNavigate(); // Initialize the navigate function
+
+  const handleSignupClick = () => {
+    navigate('/signup'); // Redirect to the Signup page
+  };
+
   return (
     <>
       <section className="w-full bg-darkBlue text-white py-20 text-center">
@@ -19,10 +26,13 @@ function Footer() {
             Start using our app today.
           </h1>
           <p className="text-gray-300 text-lg mb-6 mx-auto max-w-[700px]">
-            Incididunt sint fugiat pariatur cupidatat consectetur sit cillum anim id veniam aliqua proident excepteur commodo do ea.
+            Effortlessly control your lighting with manual and automatic settings—adjust color and brightness to match your mood or activity, all from our intuitive website.
           </p>
 
-          <button className="bg-[#B04AEE] text-white px-6 py-3 rounded-full text-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all">
+          <button
+            onClick={handleSignupClick} // Call the handler to navigate
+            className="bg-[#B04AEE] text-white px-6 py-3 rounded-full text-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all"
+          >
             Get started
           </button>
         </div>
@@ -58,7 +68,9 @@ function Footer() {
           </div>
 
           {/* Copyright Text */}
-          <p className="text-sm text-gray-400 mt-4 sm:mt-0">&copy; 2024 Your Company, Inc. All rights reserved.</p>
+          <p className="text-sm text-gray-400 mt-4 sm:mt-0">
+            &copy; 2024 Your Company, Inc. All rights reserved.
+          </p>
         </div>
       </footer>
     </>
