@@ -24,6 +24,11 @@ function LandingPage() {
     'tech-details': techDetailsRef,
   };
 
+  // Handler to scroll to the "Features" section
+  const scrollToFeatures = () => {
+    featuresRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-black">
       {/* Header with references for scroll */}
@@ -31,7 +36,7 @@ function LandingPage() {
 
       {/* Sections with respective refs */}
       <section>
-        <Hero />
+        <Hero onExploreFeatures={scrollToFeatures} /> {/* Pass scroll handler */}
       </section>
 
       <section ref={aboutRef}>
@@ -41,7 +46,6 @@ function LandingPage() {
       <section>
         <OurTeam />
       </section>
-
 
       <section ref={featuresRef}>
         <Features />
@@ -55,7 +59,7 @@ function LandingPage() {
         <HowItWorks />
       </section>
 
-      <section >
+      <section>
         <BeUpdated />
       </section>
 
