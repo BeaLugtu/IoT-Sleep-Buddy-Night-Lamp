@@ -76,47 +76,6 @@ const Dashboard = () => {
     }
   };
   
-  const toggleLightOnContainer3 = async () => {
-    const userId = localStorage.getItem('user_id'); // Get user ID dynamically
-    const lightActivityId = localStorage.getItem('light_activity_id'); // Store ongoing activity ID
-  
-    if (!userId) {
-      console.error("User ID not found in localStorage");
-      return;
-    }
-  
-    try {
-      if (lightOnContainer3) {
-        // TURN LIGHT OFF in AUTOMATIC MODE
-        const response = await axiosInstance.put("/api/auth/autoTurnLightOff", { id: lightActivityId });
-  
-        const result = response.data;
-        console.log("Automatic light turned OFF:", result);
-  
-        // Clear the stored light_activity_id from localStorage
-        localStorage.removeItem("light_activity_id");
-  
-        // Update UI state
-        setLightOnContainer3(false);
-      } else {
-        // TURN LIGHT ON in AUTOMATIC MODE
-        const response = await axiosInstance.post("/api/auth/autoTurnLightOn", { user_id: userId });
-  
-        const result = response.data;
-        console.log("Automatic light turned ON:", result);
-  
-        // Store the activity ID in localStorage for future updates
-        localStorage.setItem("light_activity_id", result.id);
-  
-        // Update UI state
-        setLightOnContainer3(true);
-      }
-    } catch (error) {
-      console.error("Error toggling automatic light:", error.response ? error.response.data : error.message);
-    }
-  };
-  
-
 
   useEffect(() => {
     if (lightOnContainer3 && lightOnControl) setLightOnControl(false);
