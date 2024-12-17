@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Drawer, Button } from '@mui/material';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Ensure this is imported
 
 const navigation = [
     { name: 'About', href: 'about' },
@@ -14,6 +14,9 @@ const navigation = [
 export default function Header({ sectionsRef }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+
+    // Get the navigate function from useNavigate
+    const navigate = useNavigate(); // Add this line
 
     // Detect scroll and apply glass effect when scrolling
     useEffect(() => {
@@ -28,7 +31,7 @@ export default function Header({ sectionsRef }) {
     }, []);
 
     const handleLoginClick = () => {
-        navigate('/login');
+        navigate('/login'); // Navigate to the login page
     };
     const handleSignupClick = () => {
         navigate('/signup');
@@ -37,10 +40,10 @@ export default function Header({ sectionsRef }) {
     const logoClick = () => {
         // Scroll to the top of the page
         window.scrollTo(0, 0);
-    
+
         // Alternatively, you can refresh the page (optional)
         window.location.reload();
-    
+
         navigate("/"); // Navigate to the landing page (root)
     };
 
@@ -93,7 +96,7 @@ export default function Header({ sectionsRef }) {
                             marginRight: '12px',
                             textTransform: 'none', // Prevent uppercase transformation
                         }}
-                        onClick={handleLoginClick}
+                        onClick={handleLoginClick} // Trigger login navigation
                     >
                         Log in
                     </Button>
