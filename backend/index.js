@@ -1,17 +1,21 @@
 // index.js
-const connection = require('./config/db'); // Assuming connection.js is your DB connection file
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const passport = require('passport');
 const session = require('express-session');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+const connection = require('./config/db'); // Assuming connection.js is your DB connection file
+
+// Routes
 const registrationRoutes = require('./routes/registrationRoute');
 const loginRoutes = require('./routes/loginRoute');
 const lightActivityRoutes = require('./routes/lightActivityRoute');
+const lightRoutes = require('./routes/lightRoutes');
 
-dotenv.config(); // Load environment variables
+// Load environment variables
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,7 +32,6 @@ app.use(
 
 app.use(passport.initialize());  // Initialize Passport
 app.use(passport.session());     // Use passport sessions
-
 app.use(express.json());
 app.use(bodyParser.json());
 
@@ -40,78 +43,64 @@ app.use(cors({
   credentials: true
 }));
 
+// Google OAuth Strategy
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: "http://localhost:5000/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    // Check if the user exists in the database by Google ID
     const selectQuery = 'SELECT * FROM users WHERE google_id = ?';
     connection.query(selectQuery, [profile.id], async (err, results) => {
-      if (err) {
-        return done(err); // Handle the error if any occurs
-      }
+      if (err) return done(err);
 
-      let user = results[0]; // Get the first user from the results (if found)
-
-      // If the user doesn't exist, create a new user
+      let user = results[0];
       if (!user) {
         const insertQuery = 'INSERT INTO users (username, email, google_id, password) VALUES (?, ?, ?, ?)';
         const userData = [
-          profile.displayName, // Use the Google profile display name as username
-          profile.emails[0].value, // Use the Google email address
-          profile.id, // Google OAuth ID
-          null, // Password is null for Google users
+          profile.displayName,
+          profile.emails[0].value,
+          profile.id,
+          null
         ];
 
         connection.query(insertQuery, userData, (err, result) => {
-          if (err) {
-            return done(err); // Handle error during insertion
-          }
-
-          // Create a new user object with the data inserted
+          if (err) return done(err);
           user = { id: result.insertId, ...userData };
-          return done(null, user); // Return the user to complete the OAuth process
+          return done(null, user);
         });
       } else {
-        // User found, proceed to login
         return done(null, user);
       }
     });
   } catch (err) {
-    return done(err); // Handle any unexpected errors
+    return done(err);
   }
 }));
-
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
 
+// Routes
 app.get("/", (req, res) => {
-  res.send("Welcome to the Google Authentication Backend!");
+  res.send("Welcome to the Backend Server!");
 });
 
-app.get
-
-// Google OAuth routes
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/', session: true }), (req, res) => {
-  // Redirect to frontend dashboard
   res.redirect('http://localhost:5173/dashboard');
 });
-
 
 app.get('/auth/logout', (req, res) => {
   req.logout();
   res.redirect('http://localhost:5173/');
 });
 
-// Routes
 app.use('/api/auth', registrationRoutes);
 app.use('/api/auth', loginRoutes);
 app.use('/api/auth', lightActivityRoutes);
+app.use('/api/light', lightRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -123,3 +112,11 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
+
+
+
+
+// --------------------------------------------------------- //
+

@@ -1,0 +1,31 @@
+.container {
+    padding: 20px;
+  }
+  
+  .mode-buttons {
+    margin-bottom: 20px;
+  }
+  
+  .manual-controls, .automatic-controls {
+    margin-bottom: 20px;
+  }
+  
+  .color-picker {
+    margin-bottom: 20px;
+  }
+  
+  .color-palette {
+    margin-bottom: 20px;
+  }
+  
+  .brightness-control {
+    margin-top: 20px;
+  }
+  
+  .status {
+    margin-top: 20px;
+  }
+  
+  .button {
+    margin-right: 10px;
+  }

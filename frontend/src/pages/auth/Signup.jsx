@@ -45,10 +45,15 @@ function Signup() {
                 },
                 body: JSON.stringify(data),
             });
-
+    
             if (response.ok) {
                 const result = await response.json();
                 console.log("Registration successful:", result);
+                // Assuming the backend response includes an email sent flag
+                if (result.emailSent) {
+                    // Inform the user to check their email
+                    setError("Please check your email to verify your account.");
+                }
                 navigate("/login"); // Redirect to login page after successful registration
             } else {
                 const errorData = await response.json();
@@ -59,9 +64,12 @@ function Signup() {
             setError("An error occurred during registration");
         }
     };
+    
+    
+
 
     return (
-        <div className="flex flex-col min-h-screen items-center justify-center px-6 py-12 lg:px-8">
+        <div className="flex flex-col min-h-screen bg-black items-center justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <div
                     className="mx-auto cursor-pointer"

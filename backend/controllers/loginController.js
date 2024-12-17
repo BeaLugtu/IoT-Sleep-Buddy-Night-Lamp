@@ -23,6 +23,11 @@ exports.login = async (req, res) => {
         return res.status(400).json({ message: 'Invalid username or password' });
       }
 
+      // Check if the user has verified their email
+      if (user.verified === 0) {
+        return res.status(400).json({ message: 'Please verify your email before logging in' });
+      }
+
       // Compare the provided password with the stored hashed password
       const isMatch = await bcrypt.compare(password, user.password);
 
@@ -54,4 +59,3 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-

@@ -69,7 +69,7 @@ function Login() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen items-center justify-center px-6 py-12 lg:px-8">
+        <div className="flex flex-col min-h-screen bg-black items-center justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <div
                     className="mx-auto cursor-pointer"

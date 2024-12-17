@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import Dashboard from './pages/Dashboard'; // Assuming this is your dashboard component
+import Dashboard from './pages/DashboardFinal'; // Assuming this is your dashboard component
 
 
 const DashboardRoutes = () => {

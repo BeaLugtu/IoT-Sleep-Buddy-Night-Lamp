@@ -3,7 +3,7 @@ function TechNComponents() {
         <section className="text-white min-h-screen flex flex-col items-center justify-center py-12">
             {/* Header Section */}
             <div className="text-center mb-10">
-                <h1 className="text-4xl font-bold mb-4">Tech Stack & Hardware</h1>
+                <h1 className="text-4xl font-bold mb-4 text-white">Tech Stack & Hardware</h1>
                 <p className="text-lg text-gray-300 mb-6">A powerful combination of modern technologies and cutting-edge hardware</p>
 
             </div>

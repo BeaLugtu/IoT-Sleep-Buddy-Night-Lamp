@@ -1,20 +1,18 @@
-const mysql = require('mysql2');
+const mysql = require('mysql');
 
-// Create a new connection instance with MySQL parameters
-const connection = mysql.createConnection({
-  host: 'localhost', // Use your MySQL database host
-  user: 'root', // Replace with your MySQL username (default is 'root')
-  password: '', // Replace with your MySQL password (default is blank for phpMyAdmin)
-  database: 'smartglow' // Replace with the MySQL database name
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'light_control',
 });
 
-// Connect to the MySQL database
-connection.connect((err) => {
+db.connect((err) => {
   if (err) {
-    console.error('Connection error:', err.stack);
+    console.error('Error connecting to MySQL:', err);
     return;
   }
-  console.log('Connected to MySQL');
+  console.log('MySQL connected...');
 });
 
-module.exports = connection;
+module.exports = db;

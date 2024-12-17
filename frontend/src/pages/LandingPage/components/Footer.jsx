@@ -14,7 +14,7 @@ function Footer() {
           >
             Get started
           </h2>
-          <h1 className="text-5xl font-bold mb-4 leading-snug">
+          <h1 className="text-5xl font-bold mb-4 text-white leading-snug">
             Boost your productivity. <br />
             Start using our app today.
           </h1>
