@@ -14,7 +14,7 @@ exports.login = async (req, res) => {
       if (err) {
         console.error('Database query error:', err);
         return res.status(500).json({ message: 'Server error' });
-      }
+      } 
 
       const user = results[0];
 

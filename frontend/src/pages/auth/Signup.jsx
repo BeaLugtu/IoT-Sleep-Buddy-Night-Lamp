@@ -32,8 +32,8 @@ function Signup() {
     };
 
     const handleGoogleSignup = () => {
-        console.log("Google Sign-Up button clicked");
-        // Implement Google signup logic here
+        // Redirect user to your backend route for Google authentication
+        window.location.href = "http://localhost:5000/auth/google"; // Adjust the URL if necessary
     };
 
     const onSubmit = async (data) => {
